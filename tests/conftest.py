@@ -17,11 +17,44 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+
+def _path_from_env(name: str, default: Path) -> Path:
+    """Honour an override (e.g. an empty folder) and keep it absolute."""
+    value = os.environ.get(name)
+    path = Path(value).expanduser() if value else default
+    if not path.is_absolute():
+        path = ROOT / path
+    return path.resolve()
+
+
+DATA_ROOM = _path_from_env("DATA_ROOM_DIR", ROOT / "data_room")
+PREPARED = _path_from_env("PREPARED_DIR", ROOT / "prepared")
+
 # Deterministic test configuration.  These are read at call time.
-os.environ["DATA_ROOM_DIR"] = str(ROOT / "data_room")
-os.environ["PREPARED_DIR"] = str(ROOT / "prepared")
+os.environ["DATA_ROOM_DIR"] = str(DATA_ROOM)
+os.environ["PREPARED_DIR"] = str(PREPARED)
 os.environ["TICKET_TYPE_MIN_PROB"] = "0.6"
 os.environ["INJECTION_MIN_PROB"] = "0.5"
+
+DATASET_MISSING_MESSAGE = (
+    "dataset not present; place the course data room in data_room/ and run "
+    "python -m src.prepare"
+)
+
+DATASET_PRESENT = (
+    (DATA_ROOM / "tickets" / "support_inbox_export.json").is_file()
+    and (DATA_ROOM / "inbox" / "public_tickets.json").is_file()
+    and (DATA_ROOM / "schema" / "response_schema.py").is_file()
+    and (PREPARED / "prepare_report.json").is_file()
+)
+
+
+@pytest.fixture(scope="session")
+def dataset() -> bool:
+    """Skip data-dependent tests when the read-only data room is absent."""
+    if not DATASET_PRESENT:
+        pytest.skip(DATASET_MISSING_MESSAGE)
+    return True
 
 from src.decide import DecisionConfig, process_extraction, process_ticket  # noqa: E402
 from src.normalize import Extraction, extract, normalize_ticket  # noqa: E402
@@ -29,19 +62,19 @@ from src.resolve import LedgerRefund, PreparedData  # noqa: E402
 
 
 @pytest.fixture(scope="session")
-def data() -> PreparedData:
-    return PreparedData.load(ROOT / "prepared")
+def data(dataset) -> PreparedData:
+    return PreparedData.load(PREPARED)
 
 
 @pytest.fixture(scope="session")
-def tickets() -> dict:
+def tickets(dataset) -> dict:
     support = json.loads(
-        (ROOT / "data_room" / "tickets" / "support_inbox_export.json").read_text(
+        (DATA_ROOM / "tickets" / "support_inbox_export.json").read_text(
             encoding="utf-8"
         )
     )
     public = json.loads(
-        (ROOT / "data_room" / "inbox" / "public_tickets.json").read_text(
+        (DATA_ROOM / "inbox" / "public_tickets.json").read_text(
             encoding="utf-8"
         )
     )
@@ -49,9 +82,9 @@ def tickets() -> dict:
 
 
 @pytest.fixture(scope="session")
-def labels() -> dict:
+def labels(dataset) -> dict:
     rows = json.loads(
-        (ROOT / "data_room" / "tickets" / "eval_seed_labelled.json").read_text(
+        (DATA_ROOM / "tickets" / "eval_seed_labelled.json").read_text(
             encoding="utf-8"
         )
     )

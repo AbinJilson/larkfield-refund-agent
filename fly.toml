@@ -1,0 +1,40 @@
+# Fly.io config for the Larkfield ticket desk.
+# Deploy steps are in README.md under "Deploy".
+app = "larkfield-ticket-desk"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  HOST = "0.0.0.0"
+  CLASSIFIER = "llm"
+  DATA_ROOM_DIR = "/app/data_room"
+  PREPARED_DIR = "/app/prepared"
+  # Four slashes: absolute path /data/runs.db on the mounted volume.
+  DATABASE_URL = "sqlite:////data/runs.db"
+  # Public protection for POST /tickets (in-memory, per IP).
+  RATE_LIMIT_PER_MINUTE = "10"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+[[mounts]]
+  source = "larkfield_data"
+  destination = "/data"

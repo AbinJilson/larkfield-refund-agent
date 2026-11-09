@@ -1,0 +1,30 @@
+{
+  "case_id": "NEG-05",
+  "kind": "damage_claim_day_46_with_photo",
+  "why": "Delivered 2026-09-22T10:00Z, received 2026-11-07T10:00Z = 46 days. The 2.6 photo extension ends at 45 days, so the request is out of window. RP-3.2 2.1/2.3/2.6 -> rule 8.",
+  "ticket": {
+    "ticket_id": "NEG-05",
+    "received_at": "2026-11-07T10:00:00Z",
+    "channel": "email",
+    "from": "ben.tanaka1@mail.example",
+    "to": "support@larkfield.example",
+    "subject": "Damaged Arc floor lamp \u2014 order LF-100201",
+    "body": "Hi,\n\nThe Arc floor lamp in order LF-100201 was damaged when it arrived: the base is cracked and the lamp leans. I have attached a photo of the damage. I would like a refund of $129.\n\nThank you,\nBen Tanaka",
+    "attachments": [
+      {
+        "file_name": "lamp-base-crack.jpg",
+        "content_type": "image/jpeg",
+        "content_base64": ""
+      }
+    ]
+  },
+  "expected": {
+    "outcome": "REJECT",
+    "approver_role": null,
+    "reason_codes": [
+      "OUT_OF_WINDOW"
+    ],
+    "amount_usd": null,
+    "human_approval_required": false
+  }
+}

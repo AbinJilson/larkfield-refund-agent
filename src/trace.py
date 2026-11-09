@@ -48,6 +48,12 @@ class Trace:
     """The calls made for one run, in order."""
 
     calls: list[ModelCallRecord] = field(default_factory=list)
+    tools: list[str] = field(default_factory=list)
+
+    def mark_tool(self, name: str) -> None:
+        """Record a pipeline stage in the order it ran."""
+        if name not in self.tools:
+            self.tools.append(name)
 
     def record(
         self,
@@ -122,7 +128,7 @@ class Trace:
                 )
                 for call in self.calls
             ],
-            tools_called=["openrouter"],
+            tools_called=list(self.tools),
             documents_used=[
                 schema.DocumentUsed(
                     document="policies/refund_policy_RP-3.2.md",

@@ -381,8 +381,8 @@ a MISMATCH if the rule were changed to use `shipped_at`.
 
 The deterministic pipeline is implemented in `src/normalize.py`,
 `src/resolve.py`, `src/checks.py` and `src/decide.py`; the model layer in
-section 9 sits in front of it, and `src/app.py` is not wired to either yet.
-Contract models
+section 9 sits in front of it, and `src/app.py` wires both into the service
+(section 10). Contract models
 (`Ticket`, `Check`, `Evidence`, ...) are loaded by path from
 `DATA_ROOM_DIR/schema/response_schema.py`; the only internal models are
 `Extraction`, `ExtractedLine`, `NormalizedTicket`, `Resolution`, `ResolvedLine`
@@ -411,16 +411,16 @@ $150.01, 10×24h / +1s), the failure paths (missing shipment, UNAVAILABLE
 carrier, unknown order, wrong sender) and an AST scan proving no `float` in
 `checks.py` or `decide.py`.
 
-`python -m pytest -q` → **104 passed**. The 96 deterministic tests cover the 15
-labels, one test per DECIDED ruling, the exact boundaries (30×24h / +1s, 45×24h
-with photo, $150.00 / $150.01, 10×24h / +1s), the failure paths (missing
-shipment, UNAVAILABLE carrier, unknown order, wrong sender) and an AST scan
-proving no `float` in `checks.py` or `decide.py`. The 8 model-layer tests use a
-fake httpx client only. All 15 labels match on outcome,
-approver, approval flag, amount and reason codes. The 40-ticket decision table
-is generated at `tests/output/decisions.md`. That table runs each ticket on its
-own; passing the earlier ledger row flips T027/T028 to REJECT /
-ALREADY_REFUNDED as described by ruling 1.
+`python -m pytest -q` → **123 passed** at the final round. The suite covers
+the 15 labels, one test per DECIDED ruling, the exact boundaries (30×24h / +1s,
+45×24h with photo, $150.00 / $150.01, 10×24h / +1s), the failure paths (missing
+shipment, UNAVAILABLE carrier, unknown order, wrong sender), the API and
+idempotency/approval flows, both reply wordings, the v1/v2 classifier prompt and
+an AST scan proving no `float` in `checks.py` or `decide.py`. All 15 labels
+match on outcome, approver, approval flag, amount and reason codes. The
+40-ticket decision table is generated at `tests/output/decisions.md`. That table
+runs each ticket on its own; passing the earlier ledger row flips T027/T028 to
+REJECT / ALREADY_REFUNDED as described by ruling 1.
 
 ## 9. Model layer (stage 2)
 
@@ -505,57 +505,184 @@ plus the 15 labels.
 
 | Field | `decider` | `llm` |
 |---|---:|---:|
-| type | 29/40 | 23/40 |
+| type | 29/40 | 27/40 |
 | order_ids | 40/40 | 40/40 |
 | affected_lines | 40/40 | 40/40 |
-| qty | 36/40 | 36/40 |
+| qty | 40/40 | 40/40 |
 | claim_kind | 30/40 | 30/40 |
 | photo_damage | 40/40 | 40/40 |
-| E2E vs decisions table | 36/40 | 40/40 |
-| 15 labels | 13/15 | 15/15 |
-| input / output tokens | 26,463 / 4,990 | 24,244 / 5,935 |
-| list cost / billed (first run) | $0.02041390 / $0.01989370 | $0.02211070 / $0.00433160 |
+| E2E vs decisions table | 39/40 | 40/40 |
+| 15 labels | 15/15 | 15/15 |
+| input / output tokens | 28,263 / 4,999 | 28,724 / 5,918 |
+| list cost / billed (fresh run) | $0.02097640 / $0.02097640 | $0.02341220 / $0.00563310 |
 
-A second run replayed every call from the cache (80/80 hits, $0 billed) and
-produced identical scores, so the table above is reproducible.
+The classifier prompt is versioned for the before/after eval
+(`CLASSIFY_PROMPT_VERSION=v1|v2`, default `v2`). v1 is the original option
+text; v2 is the sharpened text above. The before/after runs use
+`CLASSIFIER=decider`, because the change targets the decider's sub-threshold
+probabilities: `eval/results/run_20261109T151707Z.json` (v1) and
+`eval/results/run_20261109T152744Z.json` (v2). Rule-13 fallbacks went from 7
+(T013, T014, T016, T024, P07, P09, P10) to 1 (T010), labels from 13/15 to
+15/15 and gold from 33/40 to 39/40. `TICKET_TYPE_MIN_PROB` is unchanged at 0.6.
+llm mode was also checked with v1 and v2 and showed no difference: 15/15
+labels, 40/40 gold, 0 fallbacks in both ($0.02212070 vs $0.02341470).
 
-`decider` E2E differences: P09 and T013 `ESCALATE` (rule 13) vs
-`UNABLE_TO_VERIFY`; T014 `ESCALATE` vs `REJECT`; T016 `ESCALATE` vs `PROCEED`.
-All four are the decider's own low confidence (0.51–0.59) on an ambiguous
-status-vs-delivery or change-of-mind wording, so rule 13 escalates instead of
-reaching rules 4–12. `llm` has no E2E differences.
+`decider` E2E difference: T010 `ESCALATE` (rule 13) vs `PROCEED` — the decider
+is at 0.57 on that status question. `llm` has no E2E differences. T027/T028
+would flip to `ALREADY_REFUNDED` once earlier REFUND rows are in the database
+(ruling 1), which the stage-3 eval exercises separately.
 
 Injection: recall 3/3 (T020, T021, P05) and 0 false positives on the other 37,
 in both modes.
 
-Field failures that persist, and general fixes (no ticket-specific prompt
-tweaks):
+Field failures that persist:
 
-- **type (both modes).** The models split on the same two boundaries:
-  `ORDER_STATUS` vs `DELIVERY_ISSUE` for "where is my order?" against a
-  non-delivery claim, and `RETURN` vs `REFUND` for change of mind. The
-  extractor's `claim_kind` shows the same split (`ORDER_STATUS` vs
-  `NOT_DELIVERED`). General fix: define the boundary in the class descriptions
-  (a status question mentions no missing parcel; a non-delivery claim says the
-  parcel did not arrive) and, for the decider, treat the two pairs as a
-  hierarchy rather than mutually exclusive options. `decide.py` already treats
-  each pair identically, so E2E is unaffected in `llm` mode.
-- **qty (both modes, 4 tickets: P05, T006, T020, T021).** The model returns
-  `null` where gold says 1 because those emails never state a quantity and the
-  prompt says to use null when unstated. This is a convention mismatch, not a
-  wrong answer: `resolve.py` maps null to 1 on a single-unit line and caps at
-  the ordered qty. General fix: score null as correct when the line has ordered
-  qty 1, or add an explicit "default to 1 when unstated" rule on both sides.
-  Do not change the prompt just to match these four tickets.
+- **type (both modes).** The remaining misses are `RETURN` vs `REFUND` on
+  change-of-mind emails that literally say "return ... for a refund" (T014–T017,
+  P07, P10, T030) and `ORDER_STATUS` vs `DELIVERY_ISSUE` on "tracking hasn't
+  moved / is it lost" emails (P06, T011, T012, T024). Both pairs take the same
+  branch in `decide.py` (`is_refund` and `STATUS_CLAIMS`), so no outcome changes;
+  the distinction is genuinely ambiguous in the text and the 15 human labels do
+  not test it.
+- **qty.** Now 40/40: the scorer counts a model `null` as 1 when every matching
+  order line holds a single unit, which is exactly what `resolve.py` does. The
+  extraction prompt was not changed.
 - **claim_kind (both modes, 10 tickets).** Same status vs non-delivery split as
   `type`, plus T021 `CHANGE_OF_MIND` vs `UNSPECIFIED` (a return with no reason).
   `claim_kind` only affects damage/fee handling, and `photo_damage` is 40/40,
   so no outcome changes.
 
-Recommended mode: **`llm`**. It has the same extraction quality, better
-calibration at the 0.6 threshold (no rule-13 fallbacks), 15/15 labels and
-40/40 E2E, while the decider's status/delivery ambiguity sits just under the
-threshold and escalates four resolvable tickets. The decider is cheaper to
-reason about (fixed choices, no prompt to drift), so it is the fallback if
-calibration is tuned later.
+Default mode: **`llm`** (set `CLASSIFIER=llm` in `.env`). It is 40/40 on the
+gold decisions table and 15/15 on the labels, and it has no rule-13 fallbacks.
+The decider is close (39/40, 15/15) and cheaper to reason about (fixed choices,
+no prompt drift), so it stays available with `CLASSIFIER=decider`.
+
+The gold extractions in `tests/fixtures/gold_extractions.json` were written by
+the same agent that built the pipeline, so they are not independent. The 15
+human labels in `data_room/tickets/eval_seed_labelled.json` are the independent
+check, and both modes match all 15.
+
+## 10. Service (stage 3)
+
+`src/app.py` is a factory (`create_app(settings, extractor=..., classifier=...)`)
+so tests can inject fakes. `src/solution.py` loads dotenv and starts uvicorn on
+`PORT`. Routes: `POST /tickets`, `POST /runs/{run_id}/decision`,
+`GET /runs/{run_id}`, `GET /ledger` (all rows newest first, or one ticket with
+`?ticket_id=...`), `GET /health`. Out-of-order
+models or an exception anywhere in the pipeline are caught and returned as a
+valid `TicketResponse` with `UNABLE_TO_VERIFY`; the failed run still gets its
+one REPLY ledger row and is stored, so a retry returns the same response and the
+service never returns a 500 with a half-written run.
+
+### Persistence (`src/store.py`)
+
+SQLAlchemy 2 on `DATABASE_URL` (`sqlite:///runs.db` by default, Postgres via
+`postgresql+psycopg://...`). Only portable column types are used: `String`,
+`Text`, `Integer` and `Numeric(12, 2)`; SQLite-only SQL is not used.
+
+- `runs`: `run_id` (PK), `ticket_id` (UNIQUE, indexed), the full
+  `TicketResponse` JSON in `response_json`, `created_at`.
+- `ledger`: id, `run_id`, `ticket_id`, `action`, `amount_usd`
+  `Numeric(12, 2)` (nullable for REPLY/ESCALATION), `status`, `recorded_at`, plus
+  internal `order_id` / `line_no` / `detail_json` used only for the RP-3.2 2.5
+  deduction. The contract `LedgerEntry` is built at the boundary, and that is
+  the only place a `Decimal` becomes `float`.
+- `decisions`: every successful approve/reject call, including a repeated
+  identical decision; `run_id`, `decision`, free-text `approver`, `recorded_at`.
+  A conflicting decision raises before anything is written.
+
+A normal run writes one REPLY row, a REFUND row (`PROPOSED`) when the amount is
+above 0, and an ESCALATION row for `ESCALATE` — all in one transaction with the
+run row. `save_run` relies on the unique `ticket_id` for simultaneous posts: the
+loser rolls back and returns the winner's stored JSON. A repeated POST checks for
+the stored response first, so it makes no model calls, writes no rows and does
+no recomputation. `ledger_refunds` reads non-REJECTED REFUND rows from the
+database, which is how T027/T028 become `REJECT / ALREADY_REFUNDED` after T002 /
+T005.
+
+### Decisions
+
+`POST /runs/{run_id}/decision` accepts `{"decision": "approve"|"reject",
+"approver": "..."}`. On a PEND run it flips the single REFUND row from
+`PROPOSED` to `APPROVED` or `REJECTED` — the same row, never a new one — and
+returns `{"run": <stored TicketResponse>, "ledger": [...]}`. The stored run still
+says PEND and the draft reply still says it is under review: the decision is the
+ledger state change, not a rewrite of the original response. Repeating the same
+decision returns it unchanged and logs the call again. A different decision, or
+a decision on a non-PEND run, is `409`; an unknown run is `404`.
+
+### Reply and trace (`src/reply.py`, `src/trace.py`)
+
+Replies are templates only. `to` is the normalized sender; the body inserts only
+a `Decimal` amount and fixed sentences, so no ticket text is echoed. PEND says
+the request is under review without an amount, a missing carrier status says we
+are checking with the carrier (4.2), ESCALATE says it went to the right team
+without naming roles, and REJECT / INVALID_REQUEST explain plainly without
+citing internal codes or clauses. For `ALREADY_REFUNDED`, an ISSUED refund in
+`refunds.csv` says the item has already been refunded, while coverage from an
+earlier ledger REFUND row that is only PROPOSED or APPROVED says a refund is
+already being processed and does not claim it has been refunded.
+
+`trace.model_calls` uses the provider's real token counts, `tools_called` is the
+pipeline order (`normalize, classify, extract, resolve, checks, decide`),
+`documents_used` is only `policies/refund_policy_RP-3.2.md` v3.2, and
+`cost_usd` is computed as `Decimal` before the schema's single `float`
+conversion.
+
+### Tests and eval
+
+`tests/test_api.py` uses `TestClient` on a per-test temporary SQLite file with
+the model mocked. It covers: same ticket twice (byte-identical, no extra model
+calls or rows), two simultaneous posts (a barrier makes both reach the pipeline;
+one run row), approve twice (one APPROVED REFUND, two decision rows), approve
+then reject and reject then approve (`409`, status unchanged), a decision on a
+non-PEND run (`409`), a classifier timeout mid-pipeline (valid
+`UNABLE_TO_VERIFY` response, stored, one REPLY row), an injected body that tries
+to claim approval and set `human_approval_required` (still ESCALATE /
+TRUST_SAFETY), T027 after T002's REFUND row through the database
+(`REJECT / ALREADY_REFUNDED`), and `GET /ledger` with no `ticket_id` returning
+every row newest first. `tests/test_reply.py` covers both `ALREADY_REFUNDED`
+wordings, and `tests/test_classify_prompt.py` pins the v1/v2 prompt text.
+
+`tests/conftest.py` skips data-dependent tests when `data_room/` or `prepared/`
+is missing, with: `dataset not present; place the course data room in data_room/
+and run python -m src.prepare`. Pure unit tests still run. Verified by pointing
+`DATA_ROOM_DIR` at an empty folder: **6 passed, 117 skipped**, no failures.
+
+`python -m pytest -q` → **132 passed** (includes the 6 hand-written negative
+cases in `eval/cases/negative/` and the rate-limit test).
+
+`python -m eval.run_eval` posts all 40 tickets in `received_at` order to
+`EVAL_BASE_URL`, validates each response and ledger row against the schema,
+runs the 6 negative cases, and writes `eval/results/run_<timestamp>.json`;
+`eval/results/summary.md` compares every committed run side by side. The two
+runs used fresh temporary SQLite databases, `CLASSIFIER=decider`,
+`MODEL_CACHE_DISABLED=1` in the server process and `CLASSIFY_PROMPT_VERSION=v1`
+then `v2` (`.env` untouched):
+
+| Check | v1 (`run_20261109T151707Z.json`) | v2 (`run_20261109T152744Z.json`) |
+|---|---:|---:|
+| 15 human labels (outcome, approver, approval flag, amount, reasons) | 13/15 | 15/15 |
+| 40 gold decisions (outcome, ledger amount, reason codes) | 33/40, 2 ledger-dependent | 39/40, 2 ledger-dependent |
+| Rule-13 fallbacks | 7 | 1 (T010) |
+| 6 negative cases | 6/6 | 6/6 |
+| Idempotency, all 40 reposted | byte-identical, ledger unchanged | byte-identical, ledger unchanged |
+| Approvals (T001, T003, T026, P02) | all pass, conflicting reject 409 | all pass, conflicting reject 409 |
+| Tokens | 30,867 input + 5,785 output | 32,937 input + 5,784 output |
+| List-price cost | $0.02372260 total; $0.00052330 median | $0.02434110 total; $0.00053680 median |
+| Latency | p50 2,820.86 ms, p95 3,600.63 ms | p50 2,469.44 ms, p95 3,479.45 ms |
+| Ledger rows, first pass | 67 | 64 |
+
+Both runs are committed with `eval/results/summary.md`. v2 is the final service
+eval. The stage-2 extraction scores remain in
+`eval/results/extraction_scores.md`.
+
+The eval cannot reset a remote database, so `DATABASE_URL` must point at a fresh
+file before the service starts. The gold table's Rule column is internal and is
+not part of the response contract, so that comparison covers outcome, amount and
+reason codes only. Postgres is supported by the portable SQLAlchemy types but
+was not run live in this round; the concurrency test uses SQLite. Approving a
+PEND run changes the ledger, by design, while the stored response and draft
+reply remain the original PEND text.
+
 

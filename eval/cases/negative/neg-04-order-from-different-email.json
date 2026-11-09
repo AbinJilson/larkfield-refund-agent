@@ -1,0 +1,24 @@
+{
+  "case_id": "NEG-04",
+  "kind": "order_belongs_to_a_different_customer",
+  "why": "LF-100204 belongs to Elena Wu; the sender is Asha Shah. RP-3.2 4.1 -> rule 3.",
+  "ticket": {
+    "ticket_id": "NEG-04",
+    "received_at": "2026-11-04T11:20:00Z",
+    "channel": "email",
+    "from": "asha.shah0@mail.example",
+    "to": "support@larkfield.example",
+    "subject": "Refund for order LF-100204",
+    "body": "Hello,\n\nPlease refund order LF-100204. The stoneware mug set arrived smashed and two of the four mugs are in pieces.\n\nThanks,\nAsha Shah",
+    "attachments": []
+  },
+  "expected": {
+    "outcome": "INVALID_REQUEST",
+    "approver_role": null,
+    "reason_codes": [
+      "CUSTOMER_MISMATCH"
+    ],
+    "amount_usd": null,
+    "human_approval_required": false
+  }
+}

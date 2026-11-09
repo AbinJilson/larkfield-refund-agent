@@ -1,0 +1,24 @@
+{
+  "case_id": "NEG-03",
+  "kind": "order_id_one_digit_off",
+  "why": "LF-100255 is one digit away from the sender's real order LF-100245 and must not be fuzzy-matched. RP-3.2 4.1 -> rule 2.",
+  "ticket": {
+    "ticket_id": "NEG-03",
+    "received_at": "2026-11-04T08:05:00Z",
+    "channel": "email",
+    "from": "uma.nair50@mail.example",
+    "to": "support@larkfield.example",
+    "subject": "Refund for order LF-100255",
+    "body": "Hi,\n\nI need a refund for order LF-100255 \u2014 the Glass vase arrived broken. I have been a customer for years and this is the second problem with a delivery.\n\nThanks,\nUma Nair",
+    "attachments": []
+  },
+  "expected": {
+    "outcome": "INVALID_REQUEST",
+    "approver_role": null,
+    "reason_codes": [
+      "ORDER_NOT_FOUND"
+    ],
+    "amount_usd": null,
+    "human_approval_required": false
+  }
+}

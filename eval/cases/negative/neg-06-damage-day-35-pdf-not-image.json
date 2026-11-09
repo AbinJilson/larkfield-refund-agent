@@ -1,0 +1,30 @@
+{
+  "case_id": "NEG-06",
+  "kind": "damage_claim_day_35_pdf_attachment",
+  "why": "Delivered 2026-09-22T12:00Z, received 2026-10-27T12:00Z = 35 days. A PDF is not an image, so the 2.6 45-day extension does not apply and the 30-day window rejects. RP-3.2 2.1/2.3/2.6 -> rule 8.",
+  "ticket": {
+    "ticket_id": "NEG-06",
+    "received_at": "2026-10-27T12:00:00Z",
+    "channel": "email",
+    "from": "dev.costa3@mail.example",
+    "to": "support@larkfield.example",
+    "subject": "Cracked Glass vase \u2014 order LF-100203",
+    "body": "Hello,\n\nThe Glass vase from order LF-100203 arrived cracked at the rim. I attached the damage report as a PDF from the delivery inspection. Please refund the $45.\n\nRegards,\nDev Costa",
+    "attachments": [
+      {
+        "file_name": "delivery-inspection.pdf",
+        "content_type": "application/pdf",
+        "content_base64": ""
+      }
+    ]
+  },
+  "expected": {
+    "outcome": "REJECT",
+    "approver_role": null,
+    "reason_codes": [
+      "OUT_OF_WINDOW"
+    ],
+    "amount_usd": null,
+    "human_approval_required": false
+  }
+}

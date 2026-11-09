@@ -22,7 +22,7 @@ def test_gold_covers_all_40_tickets(gold, tickets):
     assert set(gold) == set(tickets)
 
 
-def test_every_gold_extraction_validates(gold, extraction_from_gold):
+def test_every_gold_extraction_validates(gold, extraction_from_gold, dataset):
     for ticket_id, entry in gold.items():
         extraction = extraction_from_gold(entry, ticket_id)
         assert extraction.ticket_id == ticket_id

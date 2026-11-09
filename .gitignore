@@ -1,0 +1,16 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+prepared/
+*.db
+*.zip
+.DS_Store
+.vscode/
+.idea/
+
+# Local OpenCode config (holds the API key); template is opencode.example.json
+opencode.json
+
+# Dataset stays local (not published)
+data_room/

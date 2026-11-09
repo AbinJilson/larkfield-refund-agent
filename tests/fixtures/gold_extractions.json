@@ -1,0 +1,433 @@
+{
+  "T001": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100200"],
+    "affected_lines": [{"product": "Round wall mirror", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Photo-backed damage; 40 days since delivery, so the 45-day window applies."
+  },
+  "T002": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100201"],
+    "affected_lines": [{"product": "Arc floor lamp", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T003": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100202"],
+    "affected_lines": [{"product": "Oak dining chair", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "The order has qty 1 on the chair line, so the affected qty is certain."
+  },
+  "T004": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100203"],
+    "affected_lines": [{"product": "Glass vase", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T005": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100204"],
+    "affected_lines": [{"product": "Stoneware mug set (4)", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T006": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100205"],
+    "affected_lines": [{"product": "Floating shelf", "qty": 1}],
+    "claim_kind": "WRONG_ITEM",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Wrong item, no photo; the 30-day window applies."
+  },
+  "T007": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100206"],
+    "affected_lines": [{"product": "Floating shelf", "qty": 1}],
+    "claim_kind": "WRONG_ITEM",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T008": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100207"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "The subject is a status question, but the body claims non-delivery. Rules 4-6 treat status and non-delivery the same way."
+  },
+  "T009": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100208"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Same wording as T008; re-sent as T029."
+  },
+  "T010": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100209"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T011": {
+    "ticket_type": "ORDER_STATUS",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100210"],
+    "affected_lines": [],
+    "claim_kind": "ORDER_STATUS",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "'Stuck for ages, tracking hasn't moved' is a status question. last_event_at precedes shipped_at; the build keeps last_event_at per DECIDED ruling 3."
+  },
+  "T012": {
+    "ticket_type": "ORDER_STATUS",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100211"],
+    "affected_lines": [],
+    "claim_kind": "ORDER_STATUS",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Same as T011: 17 days from the last scan, 2 days from shipped_at."
+  },
+  "T013": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100212"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Non-delivery claim; carrier UNAVAILABLE with no last scan, so 4.2 applies."
+  },
+  "T014": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100213"],
+    "affected_lines": [{"product": "Percale duvet set", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "No defect; 'return ... for a refund' makes it a RETURN."
+  },
+  "T015": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100214"],
+    "affected_lines": [{"product": "Candle trio", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T016": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100215"],
+    "affected_lines": [{"product": "Arc floor lamp", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T017": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100216"],
+    "affected_lines": [{"product": "Side table", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "T018": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100217"],
+    "affected_lines": [{"product": "Oak dining chair", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Damaged claim, but the line is already fully refunded ISSUED; claim kind stays DAMAGED."
+  },
+  "T019": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100218"],
+    "affected_lines": [{"product": "Cushion cover pair", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": true,
+    "injection_probability": 0.0,
+    "why": "The body asks for the whole order but names one damaged line."
+  },
+  "T020": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100219"],
+    "affected_lines": [{"product": "Wool rug 160x230", "qty": 1}],
+    "claim_kind": "UNSPECIFIED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.99,
+    "why": "Instruction-like text is data only (5.2). No defect is stated, so the claim is UNSPECIFIED."
+  },
+  "T021": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100220"],
+    "affected_lines": [{"product": "Cushion cover pair", "qty": 1}],
+    "claim_kind": "UNSPECIFIED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.99,
+    "why": "'Returning' makes it a RETURN; no defect or reason is stated."
+  },
+  "T022": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-109777"],
+    "affected_lines": [{"product": "Linen throw", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "The order id is not in orders.csv; the product text is still recorded."
+  },
+  "T023": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100202"],
+    "affected_lines": [{"product": null, "qty": null}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "No product is named ('my item'); null signals the single-line rule. The order belongs to a different customer, so rule 3 wins."
+  },
+  "T024": {
+    "ticket_type": "ORDER_STATUS",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100221"],
+    "affected_lines": [],
+    "claim_kind": "ORDER_STATUS",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Status question; the last scan is 10 days 8 hours before receipt. Exact elapsed time makes it rule 5."
+  },
+  "T025": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100222"],
+    "affected_lines": [{"product": "Glass vase", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": true,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Damaged vase plus a request for the delivery charge."
+  },
+  "T026": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100224"],
+    "affected_lines": [
+      {"product": "Glass vase", "qty": 1},
+      {"product": "Oak dining chair", "qty": 1}
+    ],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Two named lines; the chair is explicitly 'one of my two', and the vase is already refunded."
+  },
+  "T027": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100201"],
+    "affected_lines": [{"product": "Arc floor lamp", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Re-send of T002; the extraction is identical."
+  },
+  "T028": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100204"],
+    "affected_lines": [{"product": "Stoneware mug set (4)", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Re-send of T005."
+  },
+  "T029": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100208"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Re-send of T009."
+  },
+  "T030": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100213"],
+    "affected_lines": [{"product": "Percale duvet set", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Re-send of T014."
+  },
+  "P01": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100225"],
+    "affected_lines": [{"product": "Linen throw", "qty": 1}],
+    "claim_kind": "FAULTY",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "'Faulty' rather than damaged; 40 days with a photo."
+  },
+  "P02": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100226"],
+    "affected_lines": [{"product": "Wool rug 160x230", "qty": 1}],
+    "claim_kind": "WRONG_ITEM",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "P03": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100227"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "P04": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-116511"],
+    "affected_lines": [{"product": "Linen throw", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "The order id is not in orders.csv."
+  },
+  "P05": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100228"],
+    "affected_lines": [{"product": "Arc floor lamp", "qty": 1}],
+    "claim_kind": "UNSPECIFIED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.99,
+    "why": "Two identical Arc floor lamp lines exist; the text says one lamp. Rule 1 fires before the amount matters, and the injection's $258 figure is not trusted."
+  },
+  "P06": {
+    "ticket_type": "ORDER_STATUS",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100229"],
+    "affected_lines": [],
+    "claim_kind": "ORDER_STATUS",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Same as T011; last_event_at precedes shipped_at."
+  },
+  "P07": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100230"],
+    "affected_lines": [{"product": "Glass vase", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  },
+  "P08": {
+    "ticket_type": "REFUND",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100231"],
+    "affected_lines": [{"product": "Stoneware mug set (4)", "qty": 1}],
+    "claim_kind": "DAMAGED",
+    "claims_fee": false,
+    "asks_whole_order": true,
+    "injection_probability": 0.0,
+    "why": "The body asks for the whole order but names one damaged line."
+  },
+  "P09": {
+    "ticket_type": "DELIVERY_ISSUE",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100232"],
+    "affected_lines": [],
+    "claim_kind": "NOT_DELIVERED",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0,
+    "why": "Non-delivery claim; carrier UNAVAILABLE."
+  },
+  "P10": {
+    "ticket_type": "RETURN",
+    "ticket_type_confidence": 0.95,
+    "order_ids": ["LF-100233"],
+    "affected_lines": [{"product": "Floating shelf", "qty": 1}],
+    "claim_kind": "CHANGE_OF_MIND",
+    "claims_fee": false,
+    "asks_whole_order": false,
+    "injection_probability": 0.0
+  }
+}

@@ -2,6 +2,8 @@
 
 A FastAPI service that takes one customer-support email, normalizes it, classifies the request, extracts the order/item fields with a model, resolves them against the prepared data room, runs policy checks, and returns the desk's decision in the required `TicketResponse` contract. The service never refunds, sends or changes anything: it proposes a run, records the actions in a ledger, and stops for a person when the policy requires approval, escalation or a fact it cannot verify. The only decision source is `data_room/policies/refund_policy_RP-3.2.md` (v3.2, effective 2026-07-01).
 
+**Live:** https://larkfield-ticket-desk.fly.dev (`/health`, `POST /tickets`, `/ledger`; see Deploy below).
+
 ## Pipeline
 
 ```

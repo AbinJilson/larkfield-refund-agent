@@ -6,6 +6,8 @@ Larkfield Home is a US online retailer of furniture and home goods. Customer Car
 
 The service takes one support email as it arrives and returns the desk's decision in the `TicketResponse` contract from `data_room/schema/response_schema.py`. It proposes and records actions; it never refunds, sends or changes anything itself. A check it cannot complete is never a `PASS`. The working service is `src/app.py`; the only decision source is RP-3.2 v3.2.
 
+**Live service:** https://larkfield-ticket-desk.fly.dev (Fly.io, built from `Dockerfile` and `fly.toml`). Try `GET https://larkfield-ticket-desk.fly.dev/health`, `POST https://larkfield-ticket-desk.fly.dev/tickets` with a `Ticket` JSON body, and `GET https://larkfield-ticket-desk.fly.dev/ledger`. `POST /tickets` is rate-limited to 10 requests per minute per IP. The machine stops when idle, so the first request after a pause can take a few seconds. Smoke-tested after deploy with an invented ticket: two live `google/gemini-3.1-flash-lite` calls ($0.000402), decision `INVALID_REQUEST` / `ORDER_NOT_FOUND` as expected for a non-existent order.
+
 ## Preparing the data
 
 The course data room is **not included in this repository** for confidentiality. It belongs at `data_room/` in the repository root, with `data/` (customers, orders, order items, shipments, issued refunds), `policies/`, `tickets/`, `inbox/`, `schema/` and `DATA_DICTIONARY.md`. `python -m src.prepare` reads that read-only export and builds `prepared/` plus `prepared/prepare_report.json`; both `data_room/` and `prepared/` are git-ignored. Without the data room, the pure unit tests still run and the data-dependent tests skip with the preparation instruction.
@@ -64,7 +66,6 @@ Pass rule: all 15 labels, all gold decisions except documented ledger-dependent 
 
 ## What is not built
 
-- Deployment is prepared (`Dockerfile`, `.dockerignore`, `fly.toml`, per-IP rate limit on `POST /tickets`; steps in `README.md` under Deploy) but the public URL is added only after the owner deploys it.
 - The data room is not in this repository for confidentiality; it must be placed at `data_room/` and prepared with `python -m src.prepare`.
 - No live carrier API, no email sending, no real refund execution and no authentication. The service only proposes and records.
 - Postgres is supported by the portable SQLAlchemy types but was exercised only on SQLite.

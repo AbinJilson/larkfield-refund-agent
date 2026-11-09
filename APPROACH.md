@@ -6,7 +6,7 @@ Larkfield Customer Care answers ~1,200 emails/day and needs consistent, auditabl
 
 ## Technical approach
 
-`src/app.py` runs normalize -> classify -> extract -> resolve -> checks -> decide -> reply/persist. Models fill only `Extraction`; `src/decide.py` holds 14 ordered rules and is the only place an outcome is chosen. A check that cannot complete becomes `UNABLE_TO_VERIFY`. Money is `Decimal` until `src/store.py` builds the schema's float. The ledger is transactional and idempotent: `ticket_id` is unique, repeats return stored bytes, and a PEND decision flips one REFUND row without adding another. See [src/decide.py](src/decide.py), [src/store.py](src/store.py), [src/app.py](src/app.py).
+`src/app.py` runs normalize -> classify -> extract -> resolve -> checks -> decide -> reply/persist. Models fill only `Extraction`; `src/decide.py` holds 14 ordered rules and is the only place an outcome is chosen. A check that cannot complete becomes `UNABLE_TO_VERIFY`. Money is `Decimal` until `src/store.py` builds the schema's float. The ledger is transactional and idempotent: `ticket_id` is unique, repeats return stored bytes, and a PEND decision flips one REFUND row without adding another. Live on Fly.io: https://larkfield-ticket-desk.fly.dev
 
 ## AI tool usage
 

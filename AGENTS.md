@@ -10,6 +10,8 @@ normalize → classify (decider | llm) + extract → resolve → checks → deci
 
 `CLASSIFIER` in the environment selects `decider` or `llm`.
 
+Live deployment: https://larkfield-ticket-desk.fly.dev (Fly.io, config in `fly.toml`, secrets via `fly secrets`).
+
 ## Stack
 
 - FastAPI for the HTTP service, Pydantic v2 for the models.

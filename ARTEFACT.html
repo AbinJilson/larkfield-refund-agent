@@ -68,6 +68,9 @@ header.top{padding-block:44px 36px}
 .promise ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:.5em}
 .note{font-size:.85rem;color:var(--muted)}
+.live{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.95rem}
+.live a{font-family:var(--f-mono);font-size:.9rem;overflow-wrap:anywhere}
+.live-dot{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft);flex:none}
 
 /* simulator */
 .sim{display:grid;gap:20px;grid-template-columns:minmax(0,340px) minmax(0,1fr)}
@@ -220,6 +223,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem;border-top:1p
       <span class="eyebrow">Larkfield Customer Care · Refund policy RP-3.2</span>
       <h1>How the refund desk agent decides</h1>
       <p class="lede">Customers email about broken items, late parcels and refunds. This agent reads each email, checks the facts against our records, and follows the written refund policy to suggest what to do. Build an email below and watch every step.</p>
+      <p class="live"><span class="live-dot" aria-hidden="true"></span><span>The real agent is running live at <a href="https://larkfield-ticket-desk.fly.dev/health" target="_blank" rel="noopener">larkfield-ticket-desk.fly.dev</a></span></p>
     </div>
     <div class="promise">
       <h3>Three promises the agent keeps</h3>
@@ -417,6 +421,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem;border-top:1p
   <div class="sec-head">
     <span class="eyebrow">How well it works</span>
     <h2>Tested on 40 real-format emails and 6 traps</h2>
+    <p class="muted">Want to try the real thing? The live service answers at <a href="https://larkfield-ticket-desk.fly.dev/health" target="_blank" rel="noopener">/health</a> and accepts emails at <span class="mono">POST https://larkfield-ticket-desk.fly.dev/tickets</span> (10 per minute).</p>
     <p class="muted">15 of the emails came with answers decided by people. The agent was also checked against a full table of expected decisions, and against 6 hand-written trick emails (a hidden instruction in a forwarded message, a fake approval number, an order number one digit off, and so on).</p>
   </div>
   <div class="stats">
@@ -444,7 +449,7 @@ footer{padding-block:32px 48px;color:var(--muted);font-size:.85rem;border-top:1p
 </main>
 
 <footer class="wrap">
-  Larkfield ticket desk · decisions follow Customer Refund Policy RP-3.2 (v3.2, effective 2026-07-01). Every example on this page is invented; no customer data is shown. Code, tests and full evaluation are in this repository (see README.md, NOTES.md and eval/results/).
+  Larkfield ticket desk · live at <a href="https://larkfield-ticket-desk.fly.dev/health" target="_blank" rel="noopener">larkfield-ticket-desk.fly.dev</a> · decisions follow Customer Refund Policy RP-3.2 (v3.2, effective 2026-07-01). Every example on this page is invented; no customer data is shown. Code, tests and full evaluation are in this repository (see README.md, NOTES.md and eval/results/).
 </footer>
 
 <script>

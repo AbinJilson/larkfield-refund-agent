@@ -685,4 +685,21 @@ was not run live in this round; the concurrency test uses SQLite. Approving a
 PEND run changes the ledger, by design, while the stored response and draft
 reply remain the original PEND text.
 
+## 11. Deployment
 
+Live: https://larkfield-ticket-desk.fly.dev (Fly.io app `larkfield-ticket-desk`, region `iad`, one
+`shared-cpu-1x` machine with 512 MB, auto-stop when idle).
+
+- Built from `Dockerfile` with `fly deploy` from the local checkout, so
+  `data_room/` is in the image but never goes through git. `src.prepare` runs at
+  build time.
+- `DATABASE_URL=sqlite:////data/runs.db` on the 1 GB volume `larkfield_data`.
+- `OPENROUTER_API_KEY` and the model settings are Fly secrets; `fly.toml` holds
+  only non-secret config. `CLASSIFIER=llm`, `CLASSIFY_PROMPT_VERSION=v2`.
+- `POST /tickets` is rate-limited to 10 requests per minute per IP.
+- Smoke test after deploy: `/health` ok, `/ledger` 200, and an invented ticket
+  (non-existent order) made two live `google/gemini-3.1-flash-lite` calls
+  ($0.000402) and returned `INVALID_REQUEST` / `ORDER_NOT_FOUND`. Only invented
+  tickets were posted, because `GET /ledger` is public.
+- The OpenRouter key was rotated after deployment; the eval numbers above come
+  from local runs, not from the live service.
